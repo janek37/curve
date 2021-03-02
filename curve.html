@@ -1,0 +1,67 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8"/>
+<style>
+canvas {
+    border: 1px black solid;
+}
+</style>
+</head>
+<body>
+<div>
+<label for="level">Iterations:</label><input type="text" id="level" value="10" size="4"/>
+<button type="button" onclick="javascript:main(canvasContext);" id="draw">Draw</button>
+</div>
+<canvas id="myCanvas" width="1024" height="768"></canvas>
+<script>
+let body = document.querySelector('body');
+let c = document.getElementById("myCanvas");
+let button = document.getElementById("draw");
+let levelInput = document.getElementById("level");
+let canvasContext = c.getContext('2d');
+canvasContext.lineWidth = 0.5;
+
+main(canvasContext);
+
+function main(ctx) {
+    button.disabled = true;
+    let start = {x: 10, y: 500};
+    let end = {x: 1014, y: 500};
+    clearCanvas(ctx);
+    ctx.beginPath();
+    ctx.moveTo(start.x, start.y);
+    let level = parseInt(levelInput.value);
+    drawCurve(ctx, start, end, 0, 1, level, -1);
+    ctx.stroke();
+    level++;
+    button.disabled = false;
+}
+
+function drawCurve(ctx, start, end, startRef, endRef, level, dir) {
+    if (level === 0) {
+        ctx.lineTo(end.x, end.y);
+        return;
+    }
+    let middleRef = (startRef + endRef) / 2;
+    let dim = middleRef + 1;
+    let h = Math.sqrt(4**(1-1/dim) - 1); // 2*Math.sqrt(3)/6;
+    //console.log(middleRef, h);
+    let middle = getMiddle(start, end, h*dir);
+    drawCurve(ctx, start, middle, startRef, middleRef, level-1, -dir);
+    drawCurve(ctx, middle, end, middleRef, endRef, level-1, -dir);
+}
+
+function getMiddle(start, end, h) {
+    return {
+        x: (start.x + end.x + h*(start.y - end.y)) / 2,
+        y: (start.y + end.y + h*(end.x - start.x)) / 2,
+    };
+}
+
+function clearCanvas(ctx) {
+    ctx.clearRect(0, 0, c.width, c.height);
+}
+</script>
+</body>
+</html>
