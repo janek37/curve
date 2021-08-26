@@ -9,8 +9,29 @@ canvas {
 </style>
 </head>
 <body>
+<p>Dimension:</p>
 <div>
-<label for="level">Iterations:</label><input type="number" id="level" value="10" size="4" min="0" max="24"/>
+  <input type="radio" id="var" name="dim" value="var" checked>
+  <label for="var">Varying from 1 to 2</label>
+</div>
+<div>
+  <input type="radio" id="koch" name="dim" value="koch">
+  <label for="koch">log<subscript>3</subscript> 4 (Koch curve)</label>
+</div>
+<div>
+  <input type="radio" id="randconst" name="dim" value="randconst">
+  <label for="randconst">Random, constant</label>
+</div>
+<div>
+  <input type="radio" id="randvar" name="dim" value="randvar">
+  <label for="randvar">Random, varying</label>
+</div>
+<div>
+  <input type="radio" id="randvar2" name="dim" value="randvar2">
+  <label for="randvar2">Random, varying 2</label>
+</div>
+<div>
+<label for="level">Iterations:</label><input type="number" id="level" value="14" size="4" min="0" max="24"/>
 <button type="button" onclick="javascript:main(canvasContext);" id="draw">Draw</button>
 </div>
 <canvas id="myCanvas" width="1024" height="768"></canvas>
@@ -32,24 +53,25 @@ function main(ctx) {
     ctx.beginPath();
     ctx.moveTo(start.x, start.y);
     let level = parseInt(levelInput.value);
-    drawCurve(ctx, start, end, 0, 1, level, -1);
+    let getDim = makeGetDim(getRadioValue("dim"));
+    drawCurve(ctx, start, end, 0, 1, level, -1, getDim);
     ctx.stroke();
     level++;
     button.disabled = false;
 }
 
-function drawCurve(ctx, start, end, startRef, endRef, level, dir) {
+function drawCurve(ctx, start, end, startRef, endRef, level, dir, getDim) {
     if (level === 0) {
         ctx.lineTo(end.x, end.y);
         return;
     }
     let middleRef = (startRef + endRef) / 2;
-    let dim = middleRef + 1;
+    let dim = getDim(middleRef);
     let h = Math.sqrt(4**(1-1/dim) - 1); // 2*Math.sqrt(3)/6;
     //console.log(middleRef, h);
     let middle = getMiddle(start, end, h*dir);
-    drawCurve(ctx, start, middle, startRef, middleRef, level-1, -dir);
-    drawCurve(ctx, middle, end, middleRef, endRef, level-1, -dir);
+    drawCurve(ctx, start, middle, startRef, middleRef, level-1, -dir, getDim);
+    drawCurve(ctx, middle, end, middleRef, endRef, level-1, -dir, getDim);
 }
 
 function getMiddle(start, end, h) {
@@ -59,8 +81,29 @@ function getMiddle(start, end, h) {
     };
 }
 
+function makeGetDim(id) {
+    if (id === 'var') return (ref) => ref + 1;
+    if (id === 'koch') return (ref) => 1.26185950714;
+    if (id === 'randvar') return (ref) => Math.random() + 1;
+    if (id === 'randvar2') return (ref) => Math.random()/2 + 1.2;
+    if (id === 'randconst') {
+        const rand = Math.random() + 1;
+        return (ref) => rand;
+    }
+}
+
 function clearCanvas(ctx) {
     ctx.clearRect(0, 0, c.width, c.height);
+}
+
+function getRadioValue(name) {
+  var radios = document.getElementsByName(name);
+
+  for (let radioInput of radios) {
+    if (radioInput.checked) {
+      return radioInput.value;
+    }
+  }
 }
 </script>
 </body>
