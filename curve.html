@@ -58,7 +58,7 @@ function main(ctx) {
     let getDim = makeGetDim(getRadioValue("dim"));
     drawCurve(ctx, start, end, 0, 1, level, -1, getDim);
     ctx.stroke();
-    level++;
+    addBackground(ctx, "white");
     button.disabled = false;
 }
 
@@ -69,8 +69,7 @@ function drawCurve(ctx, start, end, startRef, endRef, level, dir, getDim) {
     }
     let middleRef = (startRef + endRef) / 2;
     let dim = getDim(middleRef);
-    let h = Math.sqrt(4**(1-1/dim) - 1); // 2*Math.sqrt(3)/6;
-    //console.log(middleRef, h);
+    let h = Math.sqrt(4**(-1/dim) - 0.25);
     let middle = getMiddle(start, end, h*dir);
     drawCurve(ctx, start, middle, startRef, middleRef, level-1, -dir, getDim);
     drawCurve(ctx, middle, end, middleRef, endRef, level-1, -dir, getDim);
@@ -78,8 +77,8 @@ function drawCurve(ctx, start, end, startRef, endRef, level, dir, getDim) {
 
 function getMiddle(start, end, h) {
     return {
-        x: (start.x + end.x + h*(start.y - end.y)) / 2,
-        y: (start.y + end.y + h*(end.x - start.x)) / 2,
+        x: (start.x + end.x) / 2 + h*(start.y - end.y),
+        y: (start.y + end.y) / 2 + h*(end.x - start.x),
     };
 }
 
@@ -98,6 +97,12 @@ function clearCanvas(ctx) {
     c.width = WIDTH;
     c.height = WIDTH*0.44;
     ctx.clearRect(0, 0, c.width, c.height);
+}
+
+function addBackground(ctx, color) {
+    ctx.globalCompositeOperation='destination-over';
+    ctx.fillStyle = color;
+    ctx.fillRect(0, 0, c.width, c.height);
 }
 
 function getRadioValue(name) {
