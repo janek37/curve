@@ -2,6 +2,8 @@
 
 A fractal curve with local fractal dimension changing continuously from 1 to 2.
 
+[Demo](https://htmlpreview.github.io/?https://github.com/janek37/curve/blob/main/curve.html)
+
 ## Koch-like curves
 
 This curve is based on the [Koch curve](https://en.wikipedia.org/wiki/Koch_snowflake).
